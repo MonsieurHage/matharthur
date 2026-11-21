@@ -19,9 +19,15 @@ jobs:
         run: |
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
           wget -q https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz -O /tmp/templates.tpz
-          cd ~/.local/share/godot/export_templates/4.3.stable
-          unzip -o /tmp/templates.tpz
-          ls
+          cd /tmp && unzip -o templates.tpz -d templates_extracted >/dev/null 2>&1
+          echo "=== top level ==="
+          ls /tmp/templates_extracted
+          echo "=== find tpz ==="
+          find /tmp/templates_extracted -name "*.zip" | head
+          # copy zips to templates dir
+          find /tmp/templates_extracted -name "*.zip" -exec cp {} ~/.local/share/godot/export_templates/4.3.stable/ \;
+          echo "=== templates dir ==="
+          ls ~/.local/share/godot/export_templates/4.3.stable/
       - name: Export Web
         run: |
           mkdir -p build/web
