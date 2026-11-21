@@ -52,7 +52,7 @@ func _build_domains():
 
 func _start_domain(domain: String):
 	GameState.state["currentDomain"] = domain
-	get_tree().change_scene_to_file("res://scenes/Game.tscn")
+	get_tree().change_scene_to_file("res://scenes/Mission.tscn")
 
 func _on_play():
 	var d = Adaptive.weakest_domain()
