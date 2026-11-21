@@ -81,7 +81,7 @@ func _load_question():
 	progress_bar.value = question_index
 	progress_text.text = str(question_index) + "/" + str(TOTAL_QUESTIONS)
 	combo_label.text = "Combo x" + str(combo+1)
-	encouragement_label.text = Encouragement.get("welcome") if question_index==0 else Encouragement.get("correct") if combo>0 else "Tu peux le faire ! 💪"
+	encouragement_label.text = Encouragement.get_message("welcome") if question_index==0 else Encouragement.get_message("correct") if combo>0 else "Tu peux le faire ! 💪"
 	Speech.speak(current_question["question"])
 
 func _on_answer(idx: int, btn: Button):
@@ -108,12 +108,12 @@ func _on_answer(idx: int, btn: Button):
 		_update_wallet()
 		var res = GameState.add_xp(reward + bonus)
 		feedback_emoji.text = "✅"
-		feedback_text.text = Encouragement.get("correct")
+		feedback_text.text = Encouragement.get_message("correct")
 		feedback_reward.text = "+" + str(reward+bonus) + " 🪙  +" + str(reward+bonus) + " XP"
 		if combo >= 3:
-			feedback_reward.text += "\n" + Encouragement.get("streak", combo)
+			feedback_reward.text += "\n" + Encouragement.get_message("streak", combo)
 		if res["leveled"]:
-			feedback_reward.text += "\n" + Encouragement.get("levelup", res["level"])
+			feedback_reward.text += "\n" + Encouragement.get_message("levelup", res["level"])
 		# confetti
 		_spawn_confetti()
 		# level up check multiplayer
@@ -124,7 +124,7 @@ func _on_answer(idx: int, btn: Button):
 	else:
 		combo = 0
 		feedback_emoji.text = "❌"
-		feedback_text.text = Encouragement.get("wrong")
+		feedback_text.text = Encouragement.get_message("wrong")
 		feedback_reward.text = "0 🪙"
 		# ZPD: scaffolding augmente
 		scaffold_level = min(2, scaffold_level+1)

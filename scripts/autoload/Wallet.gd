@@ -14,7 +14,7 @@ func spend(amount: int) -> bool:
 	return GameState.spend_wallet(amount)
 
 func can_unlock_multiplayer() -> bool:
-	return get() >= MULTIPLAYER_UNLOCK_COST
+	return get_balance() >= MULTIPLAYER_UNLOCK_COST
 
 func unlock_multiplayer() -> bool:
 	if can_unlock_multiplayer() and not GameState.state["unlockedMultiplayer"]:

@@ -9,7 +9,7 @@ const DATA = {
 	"welcome": ["Bienvenue dans le Royaume des Maths !","Prêt à conquérir les nombres ?"]
 }
 
-func get(kind: String, n: int = 0) -> String:
+func get_message(kind: String, n: int = 0) -> String:
 	var arr = DATA.get(kind, DATA["correct"])
 	var s = arr[randi() % arr.size()]
 	if "{n}" in s: s = s.replace("{n}", str(n))
