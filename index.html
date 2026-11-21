@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#6C5CE7" />
+  <title>MathArthur - Le Royaume des Maths</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Écran de chargement -->
+    <div id="splash" class="screen active">
+      <div class="splash-content">
+        <div class="logo">⚔️ MathArthur ⚔️</div>
+        <div class="subtitle">Le Royaume des Mathématiques</div>
+        <div class="castle">🏰</div>
+        <div class="loading-bar"><div class="loading-fill"></div></div>
+        <div class="loading-text">Chargement du royaume...</div>
+      </div>
+    </div>
+
+    <!-- Écran d'accueil / profil -->
+    <div id="home" class="screen">
+      <header class="top-bar">
+        <div class="brand">⚔️ MathArthur</div>
+        <div class="wallet">
+          <span class="coin-icon">🪙</span>
+          <span id="walletAmount">0</span>
+        </div>
+        <div class="streak-badge">
+          <span>🔥</span><span id="streakCount">0</span>
+        </div>
+      </header>
+
+      <main class="home-main">
+        <section class="hero">
+          <h1>Bienvenue, Chevalier !</h1>
+          <p class="hero-sub">Maîtrise les maths pour conquérir le royaume.</p>
+        </section>
+
+        <section class="avatar-card">
+          <div class="avatar-preview" id="avatarPreview">🧙‍♂️</div>
+          <div class="avatar-info">
+            <div class="level">Niveau <span id="playerLevel">1</span></div>
+            <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+            <div class="xp-text"><span id="xpCurrent">0</span> / <span id="xpNext">100</span> XP</div>
+          </div>
+          <button class="btn btn-secondary" id="customizeBtn">✨ Personnaliser</button>
+        </section>
+
+        <section class="domains">
+          <h2>Choisis ton aventure</h2>
+          <div class="domain-grid" id="domainGrid"></div>
+        </section>
+
+        <section class="quick-actions">
+          <button class="btn btn-primary big" id="dailyChallengeBtn">🎯 Défi du jour</button>
+          <button class="btn btn-accent big" id="multiplayerBtn">👥 Multijoueur</button>
+          <button class="btn btn-ghost" id="leaderboardBtn">🏆 Classement</button>
+        </section>
+      </main>
+    </div>
+
+    <!-- Écran de jeu -->
+    <div id="game" class="screen">
+      <header class="top-bar">
+        <button class="icon-btn" id="backBtn">⬅️</button>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-text" id="progressText">0/10</div>
+        </div>
+        <div class="wallet">
+          <span class="coin-icon">🪙</span>
+          <span id="walletAmountGame">0</span>
+        </div>
+      </header>
+
+      <main class="game-main">
+        <div class="question-card" id="questionCard">
+          <div class="domain-tag" id="domainTag">Nombres</div>
+          <div class="difficulty-tag" id="difficultyTag">⭐</div>
+          <div class="question-text" id="questionText">...</div>
+          <div class="question-visual" id="questionVisual"></div>
+          <div class="answers" id="answers"></div>
+          <div class="hint-area" id="hintArea"></div>
+        </div>
+
+        <div class="side-panel">
+          <div class="encouragement" id="encouragement">Tu peux le faire ! 💪</div>
+          <div class="combo" id="combo">Combo x1</div>
+          <div class="timer" id="timer">⏱️ 30</div>
+          <div class="helpers">
+            <button class="helper-btn" id="hintBtn" title="Indice">💡</button>
+            <button class="helper-btn" id="explainBtn" title="Explication orale">🔊</button>
+            <button class="helper-btn" id="videoBtn" title="Vidéo">🎬</button>
+            <button class="helper-btn" id="skipBtn" title="Passer">⏭️</button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Feedback overlay -->
+      <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="feedback-box" id="feedbackBox">
+          <div class="feedback-emoji" id="feedbackEmoji">✅</div>
+          <div class="feedback-text" id="feedbackText">Bravo !</div>
+          <div class="feedback-reward" id="feedbackReward"></div>
+          <div class="feedback-actions">
+            <button class="btn btn-primary" id="nextBtn">Suivant ➡️</button>
+            <button class="btn btn-ghost" id="explainAfterBtn">📖 Explication</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Écran de personnalisation -->
+    <div id="customize" class="screen">
+      <header class="top-bar">
+        <button class="icon-btn" id="backCustomizeBtn">⬅️</button>
+        <div class="title">✨ Personnalisation</div>
+        <div class="wallet">
+          <span class="coin-icon">🪙</span>
+          <span id="walletAmountCustom">0</span>
+        </div>
+      </header>
+      <main class="customize-main">
+        <div class="avatar-big" id="avatarBig">🧙‍♂️</div>
+        <div class="shop-tabs" id="shopTabs"></div>
+        <div class="shop-grid" id="shopGrid"></div>
+      </main>
+    </div>
+
+    <!-- Écran multijoueur -->
+    <div id="multiplayer" class="screen">
+      <header class="top-bar">
+        <button class="icon-btn" id="backMultiBtn">⬅️</button>
+        <div class="title">👥 Multijoueur</div>
+        <div class="wallet">
+          <span class="coin-icon">🪙</span>
+          <span id="walletAmountMulti">0</span>
+        </div>
+      </header>
+      <main class="multi-main" id="multiMain"></main>
+    </div>
+
+    <!-- Écran classement -->
+    <div id="leaderboard" class="screen">
+      <header class="top-bar">
+        <button class="icon-btn" id="backLeaderBtn">⬅️</button>
+        <div class="title">🏆 Classement</div>
+      </header>
+      <main class="leader-main" id="leaderMain"></main>
+    </div>
+
+    <!-- Explication vidéo modale -->
+    <div class="modal" id="videoModal">
+      <div class="modal-content">
+        <button class="modal-close" id="closeVideoBtn">✕</button>
+        <h3 id="videoTitle">Explication vidéo</h3>
+        <div class="video-frame" id="videoFrame"></div>
+        <p id="videoDesc"></p>
+      </div>
+    </div>
+
+    <!-- Explication modale -->
+    <div class="modal" id="explainModal">
+      <div class="modal-content">
+        <button class="modal-close" id="closeExplainBtn">✕</button>
+        <h3>📖 Explication</h3>
+        <div id="explainContent"></div>
+        <button class="btn btn-primary" id="speakExplainBtn">🔊 Écouter</button>
+      </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toastContainer"></div>
+
+    <!-- Confetti canvas -->
+    <canvas id="confettiCanvas"></canvas>
+  </div>
+
+  <script src="js/data/questions.js"></script>
+  <script src="js/data/encouragements.js"></script>
+  <script src="js/data/shop.js"></script>
+  <script src="js/core/storage.js"></script>
+  <script src="js/core/adaptive.js"></script>
+  <script src="js/core/wallet.js"></script>
+  <script src="js/core/avatar.js"></script>
+  <script src="js/core/speech.js"></script>
+  <script src="js/core/video.js"></script>
+  <script src="js/core/multiplayer.js"></script>
+  <script src="js/ui/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
