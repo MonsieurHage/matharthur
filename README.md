@@ -1,5 +1,15 @@
 # MathArthur - Le Royaume des Mathématiques
 
+## Les cartes et l’atelier
+
+Le menu permet de choisir un thème : **Les Jardins du Calcul**, **Les Ruines aux Formes**, **Le Désert des Mesures** ou **L’Archipel des Données**. Les drapeaux conduisent progressivement vers l’extérieur de chaque carte.
+
+Les bonnes réponses rapportent des **Arthéons**. Dans **l’Atelier d’Arthur**, les équipements s’achètent avec cette monnaie de jeu, puis s’équipent et se retirent gratuitement. Les achats et la tenue restent enregistrés sur l’appareil.
+
+**Commandes de l’île :** ZQSD, WASD ou flèches pour se déplacer, Maj à maintenir pour courir, Espace pour sauter, clic droit maintenu et mouvement de souris pour tourner la caméra, molette pour zoomer. Sur écran tactile, glisser sur le décor pour tourner la caméra et utiliser les boutons de déplacement, **Courir** et **Sauter**.
+
+Vérifier le parcours et les achats avec `godot --headless res://tests/IslandSmoke.tscn`.
+
 Jeu éducatif 3D pour les élèves de CM2 (Cours Moyen 2), développé avec **Godot 4** et des assets créés avec **Blender**.
 
 ## Objectif pédagogique

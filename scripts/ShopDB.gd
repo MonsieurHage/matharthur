@@ -1,6 +1,38 @@
 # ShopDB.gd
 extends Node
 
+const CURRENCY := "Arthéons"
+const GEAR := [
+	{"id":"cap", "slot":"head", "name":"Casquette du Cartographe", "price":25},
+	{"id":"crown", "slot":"head", "name":"Couronne des Énigmes", "price":100},
+	{"id":"cape", "slot":"back", "name":"Cape de l’Aurore", "price":50},
+	{"id":"pack", "slot":"back", "name":"Sac des Explorateurs", "price":75},
+	{"id":"compass", "slot":"badge", "name":"Insigne de la Boussole", "price":30},
+	{"id":"crystal", "slot":"badge", "name":"Insigne du Cristal", "price":65},
+]
+
+# Apply to a profile, then the caller saves once. Old balances remain valid.
+func change_gear(profile: Dictionary, id: String) -> bool:
+	for item in GEAR:
+		if item["id"] != id:
+			continue
+		var owned: Array = profile.get("adventure_owned", [])
+		var equipment: Dictionary = profile.get("adventure_equipment", {})
+		if not owned.has(id):
+			if int(profile["wallet"]) < item["price"]:
+				return false
+			profile["wallet"] -= item["price"]
+			owned.append(id)
+		var slot: String = item["slot"]
+		if equipment.get(slot, "") == id:
+			equipment.erase(slot)
+		else:
+			equipment[slot] = id
+		profile["adventure_owned"] = owned
+		profile["adventure_equipment"] = equipment
+		return true
+	return false
+
 const CATEGORIES = [
 	{"key":"avatars","label":"Personnages","icon":"🧙"},
 	{"key":"hats","label":"Chapeaux","icon":"🎩"},
