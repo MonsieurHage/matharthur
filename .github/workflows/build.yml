@@ -5,9 +5,21 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build-web:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Godot
@@ -20,13 +32,7 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
           wget -q https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz -O /tmp/templates.tpz
           cd /tmp && unzip -o templates.tpz -d templates_extracted >/dev/null 2>&1
-          echo "=== top level ==="
-          ls /tmp/templates_extracted
-          echo "=== find tpz ==="
-          find /tmp/templates_extracted -name "*.zip" | head
-          # copy zips to templates dir
           find /tmp/templates_extracted -name "*.zip" -exec cp {} ~/.local/share/godot/export_templates/4.3.stable/ \;
-          echo "=== templates dir ==="
           ls ~/.local/share/godot/export_templates/4.3.stable/
       - name: Export Web
         run: |
@@ -36,3 +42,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
