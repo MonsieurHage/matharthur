@@ -15,9 +15,13 @@ jobs:
         with:
           version: 4.3.0
           use-dotnet: false
-          export-templates: true
-      - name: Verify templates
-        run: ls -la ~/.local/share/godot/export_templates/ 2>/dev/null || true
+      - name: Install export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/4.3.stable
+          wget -q https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz -O /tmp/templates.tpz
+          cd ~/.local/share/godot/export_templates/4.3.stable
+          unzip -o /tmp/templates.tpz
+          ls
       - name: Export Web
         run: |
           mkdir -p build/web
