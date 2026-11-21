@@ -50,9 +50,19 @@ blender --background --python blender/blender_generate.py
 ```
 Les fichiers `.glb` sont exportés dans `assets/models/`.
 
+## Multi-plateforme (téléphone, tablette, PC)
+
+MathArthur est conçu pour être jouable sur **téléphone, tablette et PC** :
+- **Web (PWA)** : export HTML5, installable sur mobile et desktop, interface responsive (containers adaptatifs, scroll, HFlow).
+- **Windows / macOS / Linux** : export desktop natif.
+- **Android** : export APK (preset fourni dans `export_presets.cfg`).
+- **iOS** : export possible depuis un Mac avec Xcode.
+
+Les scènes utilisent des `MarginContainer`, `ScrollContainer`, `HFlowContainer` et `GridContainer` pour s'adapter à toutes les tailles d'écran.
+
 ## Export web (GitHub Pages)
 
-Dans Godot : Projet > Exporter > Web (HTML5). Placer les fichiers exportés à la racine du repo pour GitHub Pages.
+Dans Godot : Projet > Exporter > Web (HTML5). Le workflow GitHub Actions (`.github/workflows/build.yml`) automatise l'export et le déploiement sur GitHub Pages : https://monsieurhage.github.io/matharthur/
 
 ## Dépôt
 
