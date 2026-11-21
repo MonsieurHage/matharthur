@@ -3,7 +3,7 @@ extends Node
 
 const MULTIPLAYER_UNLOCK_COST = 500
 
-func get() -> int:
+func get_balance() -> int:
 	return GameState.state["wallet"]
 
 func add(amount: int, reason: String = ""):
