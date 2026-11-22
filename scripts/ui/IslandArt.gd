@@ -225,14 +225,9 @@ func _make_flag():
 	_box(pennant, Vector3(1.24, 0.65, 0.07), Vector3(0.64, -0.3, 0), CORAL)
 	var diamond := _box(pennant, Vector3(0.28, 0.28, 0.09), Vector3(0.62, -0.3, 0), CREAM)
 	diamond.rotation.z = PI / 4
-	var beacon := Label3D.new()
-	beacon.text = "DRAPEAU"
-	beacon.font_size = 42
-	beacon.outline_size = 14
-	beacon.position.y = 3.9
-	beacon.no_depth_test = true
-	beacon.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	flag.add_child(beacon)
+	# Repère visuel simple : une bande flottante, sans Label3D (plus stable en GL Compatibility).
+	_box(flag, Vector3(0.06, 0.9, 0.06), Vector3(0, 3.25, 0), CORAL)
+	_boulder(flag, Vector3(0.18, 0.18, 0.18), Vector3(0, 3.78, 0), SAND)
 
 func _make_avatar():
 	avatar = CharacterBody3D.new()
