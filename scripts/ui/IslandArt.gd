@@ -94,6 +94,8 @@ func _ready():
 		var angle := rng.randf_range(0, TAU)
 		var r := rng.randf_range(6.5, 31.0)
 		var p := Vector3(cos(angle) * r, 0.09, sin(angle) * r)
+		if i % 2 == 0:
+			_solid_round(self, p + Vector3(0, 0.1, 0), 0.22, 0.22)
 		_boulder(self, Vector3(0.20, 0.11, 0.18), p, Color("#348577"))
 		_boulder(self, Vector3(0.14, 0.12, 0.14), p + Vector3(0, 0.15, 0),
 			[Color("#ffe193"), Color("#faf0cf"), Color("#efa5a0")][i % 3])
@@ -179,6 +181,7 @@ func _tree(place: Vector3, factor: float):
 	root.position = place
 	root.scale *= factor
 	_disc(root, 0.14, 0.29, 1.7, Vector3(0, 0.85, 0), Color("#967050"), 7)
+	_solid_round(root, Vector3(0, 0.85, 0), 0.34, 1.7)
 	_boulder(root, Vector3(1.02, 1.0, 0.94), Vector3(0, 2.08, 0), TEAL)
 	_boulder(root, Vector3(0.83, 0.84, 0.76), Vector3(0.48, 2.68, 0), GRASS)
 	_boulder(root, Vector3(0.62, 0.73, 0.74), Vector3(-0.51, 2.64, 0.07), Color("#80cf8a"))

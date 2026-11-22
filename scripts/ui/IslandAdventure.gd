@@ -53,7 +53,6 @@ var biome: int = 0
 var started_once := false
 var tondeuse_min_area := 300.0
 var tondeuse_area := 0.0
-var tondeuse_seen := false
 
 func _ready() -> void:
 	_set_world(0)
@@ -289,7 +288,6 @@ func _tondeuse_cut() -> void:
 
 func _tondeuse_done() -> void:
 	tondeuse_done = true
-	tondeuse_seen = true
 	Wallet.add(30)
 	GameState.add_xp(30)
 	GameState.record_answer("Nombres et calculs", true)
@@ -435,7 +433,7 @@ func _physics_process(delta: float) -> void:
 	if is_instance_valid(art.shipwalk):
 		art.shipwalk.position += Vector3(0, sin(clock * 0.4) * 0.03, 0)
 		art._update_shipwalk()
-	if biome == 0 and not tondeuse_done and not tondeuse_seen:
+	if biome == 0 and not tondeuse_done:
 		_update_tondeuse(delta)
 	if biome != 0 and (not started_once or index > 0):
 		if not started_once:
@@ -491,7 +489,7 @@ func _physics_process(delta: float) -> void:
 	if absf(right_distance) > absf(forward_distance):
 		bearing = "à droite" if right_distance > 0 else "à gauche"
 	play_target.text = "%d m • %s" % [ceili(distance), bearing]
-	if body.is_on_floor() and (biome != 0 or tondeuse_seen or tondeuse_done) and distance < 1.85:
+	if body.is_on_floor() and distance < 1.85:
 		_show_question()
 
 func _show_question() -> void:

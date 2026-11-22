@@ -31,8 +31,6 @@ func _ready() -> void:
 		_check(bank.size() >= adventure.TOTAL, "Le thème propose dix questions différentes")
 		await _capture("carte-%s" % i)
 	adventure._start("Nombres et calculs")
-	adventure.tondeuse_seen = true
-	adventure.tondeuse_done = true
 	await _capture("ile")
 	_check(adventure.mode == "island" and adventure.seen.is_empty(), "Aucune question avant le drapeau")
 	await _check_controls()
