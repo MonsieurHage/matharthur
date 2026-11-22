@@ -186,6 +186,8 @@ func _tree(place: Vector3, factor: float):
 
 func _gate(place: Vector3):
 	for sign_value in [-1, 1]:
+		var post_x: float = place.x + sign_value * 2.1
+		_solid_box(Vector3(post_x, 1.6, place.z), Vector3(0.75, 3.2, 0.78))
 		var x: float = place.x + sign_value * 2.1
 		_box(self, Vector3(0.75, 3.2, 0.78), Vector3(x, 1.6, place.z), CREAM)
 		for y in [0.24, 2.6, 3.1]:
@@ -203,6 +205,7 @@ func _tower(place: Vector3):
 	_disc(self, 1, 1, 0.21, place + Vector3(0, 2.95, 0), ROCK, 8)
 	_disc(self, 0.09, 1.17, 1.65, place + Vector3(0, 3.95, 0), Color("#4775ba"), 8)
 	_boulder(self, Vector3(0.16, 0.20, 0.16), place + Vector3(0, 4.86, 0), SAND)
+	_solid_round(self, place + Vector3(0, 1.55, 0), 0.96, 3.1)
 
 
 func _make_flag():
@@ -230,6 +233,7 @@ func _make_flag():
 
 func _make_avatar():
 	avatar = CharacterBody3D.new()
+	add_child(avatar)
 	avatar.motion_mode = CharacterBody3D.MOTION_MODE_GROUNDED
 	avatar.floor_snap_length = 0.18
 	avatar.collision_layer = 2
