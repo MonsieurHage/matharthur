@@ -22,7 +22,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [audio]
 
-general/text_to_speech=false
+general/text_to_speech=true
 
 [autoload]
 
@@ -33,15 +33,15 @@ Speech="*res://scripts/autoload/Speech.gd"
 Encouragement="*res://scripts/autoload/Encouragement.gd"
 QuestionsDB="*res://scripts/QuestionsDB.gd"
 ShopDB="*res://scripts/ShopDB.gd"
+Preferences="*res://scripts/autoload/Preferences.gd"
 
 [display]
 
 window/size/viewport_width=390
 window/size/viewport_height=720
-window/size/window_width_override=1280
-window/size/window_height_override=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/size/mode="fullscreen"
 
 [input]
 

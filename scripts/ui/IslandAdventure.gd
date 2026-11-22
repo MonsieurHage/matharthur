@@ -50,12 +50,22 @@ var move_touches: Dictionary = {}
 var run_button: Button
 var biome: int = 0
 
-var started_once := false
-var tondeuse_min_area := 300.0
-var tondeuse_area := 0.0
+const MOW_TIME := 45.0
+const MOW_REWARD := 20
+const MOW_COUNT := 16
+var mow_left := 0.0
+var grass: Array[Node3D] = []
+var mow_plot: Node3D
+var mower: Node3D
+const WOOD_TIME := 35.0
+var wood_left := 0.0
+var wood_trees: Array[Node3D] = []
+var wood_plot: Node3D
 
 func _ready() -> void:
 	_set_world(0)
+	if DisplayServer.get_name() != "headless" and not DisplayServer.is_touchscreen_available():
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	camera = Camera3D.new()
 	camera.fov = 54
 	add_child(camera)
@@ -120,6 +130,8 @@ func _scroll() -> VBoxContainer:
 
 func _button(parent: Container, title: String, action: Callable, primary: bool = false) -> Button:
 	var button := UI.button(title, primary)
+	if parent is FlowContainer:
+		button.autowrap_mode = TextServer.AUTOWRAP_OFF
 	button.pressed.connect(action)
 	parent.add_child(button)
 	return button
@@ -136,7 +148,15 @@ func _menu() -> void:
 	_new_screen("menu")
 	var panel := UI.card(UI.PAPER, 22)
 	screen.add_child(panel)
-	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
+	var portrait := get_viewport().get_visible_rect().size.x < 640
+	if portrait:
+		panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+		panel.offset_left = 12
+		panel.offset_right = -12
+		panel.offset_top = 12
+		panel.offset_bottom = 12
+	else:
+		panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
 	var content := UI.column(10)
 	panel.add_child(content)
 	content.add_child(UI.label("MATHARTHUR   /   AVENTURE CM2", 14, UI.BLUE))
@@ -155,14 +175,19 @@ func _menu() -> void:
 	var links := _flow()
 	content.add_child(links)
 	_button(links, "Atelier d’Arthur", _wardrobe)
-	_button(links, "Multijoueur", func(): get_tree().change_scene_to_file("res://scenes/Multiplayer.tscn"))
 	_button(links, "Mes scores", _scores)
+	_button(links, "Quitter", func(): get_tree().quit())
 	content.add_child(UI.label("%d %s dans ton porte-monnaie" % [Wallet.get_balance(), ShopDB.CURRENCY], 15, UI.MUTED))
 	quiz_card = panel
 	art.avatar.rotation.y = 2.5
 	_resize()
 
 func _start(selected_domain: String) -> void:
+	index = 0
+	score = 0
+	earned = 0
+	attempts = 0
+	seen.clear()
 	domain = selected_domain
 	GameState.state["currentDomain"] = domain
 	var biome := maxi(0, Adaptive.DOMAINS.find(domain))
@@ -170,23 +195,25 @@ func _start(selected_domain: String) -> void:
 		_set_world(biome)
 	_show_island()
 
-func _show_island() -> void:
-	_new_screen("island")
+func _show_island(mowing := false, logging := false) -> void:
+	_new_screen("wood" if logging else ("mowing" if mowing else "island"))
 	if is_instance_valid(art.shipwalk):
 		art.shipwalk.position = Vector3(38, 2.2, -10)
-	art.flag.position = art.target_at(index)
-	art.flag.show()
+	if not mowing and not logging:
+		art.flag.position = art.target_at(index)
+	art.flag.visible = not mowing and not logging
 	var panel := UI.card(UI.PAPER, 12)
-	panel.custom_minimum_size.x = 254
+	var portrait := get_viewport().get_visible_rect().size.x < 640
+	panel.custom_minimum_size.x = minf(254, get_viewport().get_visible_rect().size.x - 24)
 	screen.add_child(panel)
 	panel.position = Vector2(12, 12)
 	var group := UI.column(4)
 	panel.add_child(group)
-	group.add_child(UI.label("MISSION %02d / %02d" % [index + 1, TOTAL], 13, UI.BLUE))
-	group.add_child(UI.label(Art.NAMES[art.biome], 21))
-	group.add_child(UI.label("Trouve le drapeau corail", 15, UI.MUTED))
+	group.add_child(UI.label("COUPE DU BOIS" if logging else ("TONTE CHRONOMÉTRÉE" if mowing else "DRAPEAU %02d / %02d" % [index + 1, TOTAL]), 14, UI.BLUE))
 	play_target = UI.label("", 15, UI.MUTED)
 	group.add_child(play_target)
+	if logging:
+		_button(group, "Couper (E)", _chop, true)
 	_button(group, "Retour au menu", _back)
 	quiz_card = panel
 	var pad := UI.card(UI.PAPER, 8)
@@ -210,7 +237,6 @@ func _show_island() -> void:
 	_direction(across, "Droite", Vector2.RIGHT)
 	pad.visible = DisplayServer.is_touchscreen_available() or get_viewport().get_visible_rect().size.x < 700
 	if pad.visible:
-		group.add_child(UI.label("Glisse sur le décor pour tourner la caméra.", 14, UI.MUTED))
 		var actions := UI.card(UI.PAPER, 7)
 		screen.add_child(actions)
 		actions.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -227,81 +253,103 @@ func _show_island() -> void:
 		run_button.text = "Marcher" if touch_run else "Courir"
 		touch_buttons.append({"button": jump_button, "action": "jump"})
 		touch_buttons.append({"button": run_button, "action": "run"})
-	else:
-		group.add_child(UI.label("ZQSD / WASD ou flèches • Maj : courir\nEspace : sauter • Clic droit + souris : caméra\nMolette : zoom", 14, UI.MUTED))
 	var body: CharacterBody3D = art.avatar
 	body.velocity = Vector3.ZERO
 	_update_camera()
-	_enter_tondeuse()
 	_resize()
 
-var tondeuse_zone := Vector3.ZERO
-var tondeuse_done := false
-var tondeuse_overlay: PanelContainer
-var tondeuse_progressbar: ProgressBar
-var tondeuse_hint_label: Label
-
-func _enter_tondeuse() -> void:
-	if biome != 0 or tondeuse_done:
+func _start_mowing() -> void:
+	if mode != "finish" or index != TOTAL or score * 2 < TOTAL:
 		return
-	tondeuse_zone = art.target_at(2) + Vector3(24, 0, 6)
-	tondeuse_area = 0.0
-	tondeuse_overlay = UI.card(UI.PAPER, 8)
-	screen.add_child(tondeuse_overlay)
-	tondeuse_overlay.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
-	tondeuse_overlay.offset_left = 12
-	tondeuse_overlay.offset_right = 312
-	tondeuse_overlay.offset_top = -150
-	tondeuse_overlay.offset_bottom = -12
-	var col := UI.column(6)
-	tondeuse_overlay.add_child(col)
-	tondeuse_hint_label = UI.label("Tu as tonner le massif, roule au massif et \nplante la tondeuse", 14, UI.INK)
-	col.add_child(tondeuse_hint_label)
-	var bar := UI.xp_track(0, 60)
-	bar.custom_minimum_size.x = 260
-	col.add_child(bar)
-	tondeuse_progressbar = bar
-	_update_tondeuse(0.0)
+	mow_left = MOW_TIME
+	grass.clear()
+	mow_plot = Node3D.new()
+	art.add_child(mow_plot)
+	mower = Node3D.new()
+	art.avatar.add_child(mower)
+	art._box(mower, Vector3(0.85, 0.32, 0.82), Vector3(0, 0.27, -0.93), Art.CORAL)
+	for side in [-0.35, 0.35]:
+		var handle: MeshInstance3D = art._box(mower, Vector3(0.06, 0.86, 0.06), Vector3(side, 0.62, -0.56), Art.NAVY)
+		handle.rotation.x = 0.48
+		for depth in [-1.18, -0.72]:
+			art._disc(mower, 0.15, 0.15, 0.13, Vector3(side * 1.25, 0.16, depth), Art.NAVY, 12).rotation.z = PI / 2
+	for z in range(4):
+		for x in range(4):
+			var pos := Vector3(x * 2 - 3, 0.12, z * 2 - 3)
+			grass.append(art._box(mow_plot, Vector3(1.92, 0.24, 1.92), pos, Color("#307042")))
+	art.avatar.position = Vector3(0, 0.05, 5)
+	_show_island(true)
+	_tick_mowing(0)
 
-func _update_tondeuse(delta: float) -> void:
-	var body: CharacterBody3D = art.avatar
-	var zone_dist := body.position.distance_to(tondeuse_zone)
-	var speed := clampf(9.0 - zone_dist, 0.0, 3.0) * maxf(0.35, 1.0 - tondeuse_area / 60.0)
-	if speed > 0.4:
-		tondeuse_area = minf(tondeuse_min_area, tondeuse_area + speed * 3.0 * delta)
-	if zone_dist < 8:
-		tondeuse_area = minf(tondeuse_min_area, tondeuse_area + 0.6 * delta)
-	var recalled := tondeuse_area >= tondeuse_min_area
-	if tondeuse_progressbar != null:
-		tondeuse_progressbar.value = tondeuse_area
-	tondeuse_hint_label.text = "Plante la tondeuse quand tu es au massif" if recalled else "Roule au massif : %dm" % int(ceili(tondeuse_zone.distance_to(body.position) - 8.0))
-	if is_instance_valid(tondeuse_overlay):
-		tondeuse_overlay.visible = not recalled
-	if recalled:
-		_tondeuse_done()
+func _start_wood() -> void:
+	if mode != "finish" or index != TOTAL or score * 2 < TOTAL:
+		return
+	wood_left = WOOD_TIME
+	wood_plot = Node3D.new()
+	art.add_child(wood_plot)
+	wood_trees.clear()
+	for point in [Vector2(-3, -3), Vector2(0, -4), Vector2(3, -2), Vector2(3, 2), Vector2(-3, 2)]:
+		var tree := Node3D.new()
+		wood_plot.add_child(tree)
+		tree.position = Vector3(point.x, 0, point.y)
+		art._disc(tree, 0.24, 0.36, 1.6, Vector3.UP * 0.8, Color("#874a31"), 8)
+		art._disc(tree, 0.02, 1.0, 2.0, Vector3.UP * 2.0, Color("#267451"), 8)
+		art._disc(tree, 0.26, 0.3, 0.22, Vector3.UP, Art.CORAL, 8)
+		art._solid_round(tree, Vector3.UP, 0.42, 2.0)
+		wood_trees.append(tree)
+	art.avatar.position = Vector3(0, 0.05, 4)
+	_show_island(false, true)
+	_tick_wood(0)
 
-func _tondeuse_cut() -> void:
-	var body: CharacterBody3D = art.avatar
-	if body.position.distance_to(tondeuse_zone) < 8 and not tondeuse_done:
-		tondeuse_area = minf(tondeuse_min_area, tondeuse_area + 10)
-		_toast("Planté la tondeuse !", "")
+func _chop() -> void:
+	if mode != "wood":
+		return
+	for tree in wood_trees:
+		if art.avatar.position.distance_to(tree.position) <= 2.0:
+			tree.get_parent().remove_child(tree)
+			tree.queue_free()
+			wood_trees.erase(tree)
+			_tick_wood(0)
+			return
 
-func _tondeuse_done() -> void:
-	tondeuse_done = true
-	Wallet.add(30)
-	GameState.add_xp(30)
-	GameState.record_answer("Nombres et calculs", true)
-	_toast("Bon travail ! Tondage effectué", "")
-	# Continue to flag hunt for biome 0
-	_check_tondeuse_campaign()
+func _tick_wood(delta: float) -> void:
+	wood_left -= delta
+	if not wood_trees.is_empty() and wood_left > 0:
+		play_target.text = "%d s   •   %d / 5 sapins coupés" % [ceili(wood_left), 5 - wood_trees.size()]
+		return
+	var won := wood_trees.is_empty()
+	wood_plot.queue_free()
+	wood_trees.clear()
+	_new_screen("wood_result")
+	if won:
+		Wallet.add(20)
+	var content := _scroll()
+	content.add_child(UI.label("Bois récolté !" if won else "Temps écoulé", 30))
+	content.add_child(UI.label("+20 %s dans ton porte-monnaie." % ShopDB.CURRENCY if won else "Ton gain du quiz est conservé."))
+	_button(content, "Retour au menu", _back, true)
 
-func _check_tondeuse_campaign() -> void:
-	if tondeuse_done:
-		tondeuse_overlay.hide() if is_instance_valid(tondeuse_overlay) else null
-		started_once = true
-
-func _toast(msg: String, kind: String = ""):
-	print("[TOAST] ", msg)
+func _tick_mowing(delta: float) -> void:
+	mow_left -= delta
+	if mow_left > 0:
+		for tile in grass.duplicate():
+			var offset: Vector3 = art.avatar.position - tile.position
+			if absf(offset.x) <= 1 and absf(offset.z) <= 1 and absf(offset.y) < 0.6:
+				tile.hide()
+				grass.erase(tile)
+		play_target.text = "%d s   •   %d / %d cases tondues" % [ceili(mow_left), MOW_COUNT - grass.size(), MOW_COUNT]
+		if not grass.is_empty():
+			return
+	var won := grass.is_empty()
+	_new_screen("mow_result")
+	mow_plot.queue_free()
+	mower.queue_free()
+	grass.clear()
+	if won:
+		Wallet.add(MOW_REWARD)
+	var content := _scroll()
+	content.add_child(UI.label("Pelouse tondue !" if won else "Temps écoulé", 30))
+	content.add_child(UI.label("+%d %s dans ton porte-monnaie." % [MOW_REWARD, ShopDB.CURRENCY] if won else "La tonte est incomplète. Ton gain du quiz est conservé."))
+	_button(content, "Retour au menu", _back, true)
 
 func _direction(parent: Container, title: String, vector: Vector2) -> void:
 	var button := UI.button(title)
@@ -354,7 +402,11 @@ func _notification(what: int) -> void:
 		move_touches.clear()
 
 func _input(event: InputEvent) -> void:
-	if mode != "island":
+	if mode not in ["island", "mowing", "wood"]:
+		return
+	if mode == "wood" and event is InputEventKey and event.keycode == KEY_E and event.pressed and not event.echo:
+		_chop()
+		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("jump") and not event.is_echo():
 		_request_jump()
@@ -395,7 +447,7 @@ func _input(event: InputEvent) -> void:
 		_release_camera()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if mode != "island":
+	if mode not in ["island", "mowing", "wood"]:
 		return
 	if event is InputEventMouseButton and event.pressed:
 		match event.button_index:
@@ -428,16 +480,11 @@ func _process(delta: float) -> void:
 		return
 
 func _physics_process(delta: float) -> void:
-	if mode != "island":
+	if mode not in ["island", "mowing", "wood"]:
 		return
 	if is_instance_valid(art.shipwalk):
 		art.shipwalk.position += Vector3(0, sin(clock * 0.4) * 0.03, 0)
 		art._update_shipwalk()
-	if biome == 0 and not tondeuse_done:
-		_update_tondeuse(delta)
-	if biome != 0 and (not started_once or index > 0):
-		if not started_once:
-			started_once = true
 	var left := Input.is_action_pressed("ui_left") or Input.is_action_pressed("move_left") or Input.is_physical_key_pressed(KEY_A) or Input.is_key_pressed(KEY_Q)
 	var right_on := Input.is_action_pressed("ui_right") or Input.is_action_pressed("move_right") or Input.is_physical_key_pressed(KEY_D)
 	var up := Input.is_action_pressed("ui_up") or Input.is_action_pressed("move_forward") or Input.is_physical_key_pressed(KEY_W) or Input.is_key_pressed(KEY_Z)
@@ -481,6 +528,12 @@ func _physics_process(delta: float) -> void:
 		for arm in art.arms:
 			arm.rotation.x = 0
 	_update_camera()
+	if mode == "wood":
+		_tick_wood(delta)
+		return
+	if mode == "mowing":
+		_tick_mowing(delta)
+		return
 	var distance: float = position_flat.distance_to(art.flag.position)
 	var displacement: Vector3 = art.flag.position - position_flat
 	var forward_distance := forward.dot(displacement)
@@ -488,7 +541,7 @@ func _physics_process(delta: float) -> void:
 	var bearing := "tout droit" if forward_distance >= 0 else "vers le bas"
 	if absf(right_distance) > absf(forward_distance):
 		bearing = "à droite" if right_distance > 0 else "à gauche"
-	play_target.text = "%d m • %s" % [ceili(distance), bearing]
+	play_target.text = "Rejoins le drapeau : %d m • %s" % [ceili(distance), bearing]
 	if body.is_on_floor() and distance < 1.85:
 		_show_question()
 
@@ -555,15 +608,16 @@ func _hint() -> void:
 func _explain() -> void:
 	if mode == "quiz":
 		_hint()
-		Speech.speak(hint.text)
+		if not Speech.speak(hint.text):
+			hint.text += "\nLecture indisponible : vérifie la voix française sur ton appareil."
 	elif mode == "feedback":
-		Speech.speak(info.text)
+		var explanation := str(question["explanation"])
+		info.text = explanation
+		if not Speech.speak(explanation):
+			info.text += "\nLecture indisponible : vérifie la voix française sur ton appareil."
 
 func _video() -> void:
-	var url: String = str(question.get("videoUrl", ""))
-	if not url.begins_with("https://"):
-		url = "https://www.lumni.fr/primaire/cm2/mathematiques"
-	OS.shell_open(url)
+	QuestionsDB.open_video(question)
 
 func _answer(slot: int) -> void:
 	if mode != "quiz":
@@ -572,16 +626,17 @@ func _answer(slot: int) -> void:
 	var gained := 0
 	if slot >= 0:
 		attempts += 1
-		GameState.record_answer(question["domain"], right_answer)
+		GameState.record_answer(question["domain"], right_answer, question, buttons[slot].text.substr(4))
+	else:
+		GameState.log_exercise(question, "Passé", "—")
+		GameState.save()
 	if right_answer:
 		score += 1
 		gained = question.get("reward", 10)
 		earned += gained
 		Wallet.add(gained)
 		GameState.add_xp(gained)
-		if Wallet.get_balance() >= Wallet.MULTIPLAYER_UNLOCK_COST:
-			GameState.state["unlockedMultiplayer"] = true
-			GameState.save()
+
 	_new_screen("feedback")
 	var content := _scroll()
 	content.add_child(UI.label("DRAPEAU %02d / %02d   —   CORRECTION" % [index + 1, TOTAL], 14, UI.BLUE))
@@ -624,6 +679,13 @@ func _finish() -> void:
 	content.add_child(UI.label("MISSION TERMINÉE", 14, UI.BLUE))
 	content.add_child(UI.label("Bravo pour ton exploration !", 30))
 	content.add_child(UI.label("%d bonnes réponses et %d %s gagnés." % [score, earned, ShopDB.CURRENCY], 18, UI.MUTED))
+	if score * 2 >= TOTAL:
+		content.add_child(UI.label("Mission bonus : passe sur les 16 cases d’herbe en %d secondes pour gagner %d %s." % [int(MOW_TIME), MOW_REWARD, ShopDB.CURRENCY]))
+		_button(content, "Commencer la tonte", _start_mowing, true)
+		content.add_child(UI.label("Ou coupe les 5 sapins marqués en %d secondes : approche-toi et appuie sur E ou sur Couper. Prime : 20 %s." % [int(WOOD_TIME), ShopDB.CURRENCY]))
+		_button(content, "Couper du bois", _start_wood, true)
+	else:
+		content.add_child(UI.label("Les missions bonus se débloquent à partir de 5 bonnes réponses sur 10."))
 	_button(content, "Retour au menu", _back, true)
 
 func _wardrobe(message: String = "") -> void:
@@ -690,10 +752,10 @@ func _resize() -> void:
 		wardrobe_scroll.anchor_bottom = 1
 		wardrobe_scroll.anchor_right = 1 if portrait else 0
 		wardrobe_scroll.anchor_top = 0.42 if portrait else 0
-		wardrobe_scroll.offset_left = 14
-		wardrobe_scroll.offset_top = 14
-		wardrobe_scroll.offset_right = -14 if portrait else 440
-		wardrobe_scroll.offset_bottom = -14
+		wardrobe_scroll.offset_left = 8
+		wardrobe_scroll.offset_top = 8
+		wardrobe_scroll.offset_right = -8 if portrait else 360
+		wardrobe_scroll.offset_bottom = -8
 		camera.position = Vector3(0, 2.45, -4.2 if portrait else -1.65)
 		camera.look_at(Vector3(0, 1.55, 3))
 		camera.h_offset = 0 if portrait else -1.6
@@ -702,9 +764,16 @@ func _resize() -> void:
 	if not is_instance_valid(quiz_card):
 		return
 	if mode == "menu":
-		var size_x := minf(456, width - 28)
-		quiz_card.offset_left = 14 if width < 640 else 42
-		quiz_card.offset_right = quiz_card.offset_left + size_x
-		quiz_card.offset_top = -164
-	elif mode in ["quiz", "feedback", "finish", "scores"]:
-		quiz_card.custom_minimum_size.x = minf(720, width - 54)
+		var portrait := width < 640
+		if portrait:
+			quiz_card.offset_left = 12
+			quiz_card.offset_right = -12
+			quiz_card.offset_top = 12
+			quiz_card.offset_bottom = 12
+		else:
+			var size_x := minf(456, width - 28)
+			quiz_card.offset_left = 42
+			quiz_card.offset_right = 42 + size_x
+			quiz_card.offset_top = -164
+	elif mode in ["quiz", "feedback", "finish", "scores", "mow_result", "wood_result"]:
+		quiz_card.custom_minimum_size.x = minf(720, width - 24)
