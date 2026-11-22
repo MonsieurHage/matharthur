@@ -48,6 +48,7 @@ var touch_run := false
 var touch_buttons: Array[Dictionary] = []
 var move_touches: Dictionary = {}
 var run_button: Button
+var biome: int = 0
 
 var started_once := false
 var tondeuse_min_area := 300.0
@@ -77,6 +78,7 @@ func _set_world(theme_index: int, preview: bool = false) -> void:
 	art.shared_sky = shared_sky
 	add_child(art)
 	shared_sky = art.shared_sky
+	biome = theme_index
 
 func _new_screen(name_value: String) -> void:
 	mode = name_value
@@ -242,7 +244,7 @@ var tondeuse_hint_label: Label
 func _enter_tondeuse() -> void:
 	if biome != 0 or tondeuse_done:
 		return
-	tondeuse_zone = target_at(2) + Vector3(24, 0, 6)
+	tondeuse_zone = art.target_at(2) + Vector3(24, 0, 6)
 	tondeuse_area = 0.0
 	tondeuse_overlay = UI.card(UI.PAPER, 8)
 	screen.add_child(tondeuse_overlay)
