@@ -176,6 +176,10 @@ func _menu() -> void:
 	content.add_child(links)
 	_button(links, "Atelier d’Arthur", _wardrobe)
 	_button(links, "Mes scores", _scores)
+	_button(links, "Plein écran", func():
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN))
+	_button(links, "Fenêtre", func():
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED))
 	_button(links, "Quitter", func(): get_tree().quit())
 	content.add_child(UI.label("%d %s dans ton porte-monnaie" % [Wallet.get_balance(), ShopDB.CURRENCY], 15, UI.MUTED))
 	quiz_card = panel
