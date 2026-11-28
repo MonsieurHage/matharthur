@@ -124,6 +124,184 @@ func gen_operation(difficulty: int) -> Dictionary:
 	var idx = choices.find(res)
 	return {"id":"gen_"+str(randi()),"domain":"Nombres et calculs","skill":"Opérations","difficulty":difficulty,"question":str(a)+" "+op+" "+str(b)+" = ?","answers":choices.map(func(x): return str(x)),"correct":idx,"explanation":str(a)+" "+op+" "+str(b)+" = "+str(res),"hint":"Pense à la table ou décompose.","reward":10+difficulty*5}
 
+# ---------------------------------------------------------------------------
+# Vidéos ciblées (jaicompris.com) et explicatif vocal de secours
+# ---------------------------------------------------------------------------
+const SITE := "https://jaicompris.com"
+const V_CHIFFRES := SITE + "/lycee/math/ensemble/entier/nombres_entiers_chiffre_nombre.php"
+const V_COMPARER := SITE + "/lycee/math/ensemble/entier/nombres_entiers.php"
+const V_MULTIPLES := SITE + "/lycee/math/arithmetique/multiple_diviseur.php"
+const V_DIVISIBILITE := SITE + "/lycee/math/arithmetique/critere_divisibilite.php"
+const V_DIVISION := SITE + "/lycee/math/arithmetique/division_euclidienne_sixieme.php"
+const V_DIVISION_DEC := SITE + "/lycee/math/arithmetique/division_decimale.php"
+const V_FRACTIONS := SITE + "/lycee/math/calcul/fraction/fraction_intro_sixieme.php"
+const V_FRACTIONS_ADD := SITE + "/lycee/math/calcul/fraction/fraction_addition_sixieme.php"
+const V_MOITIE_QUART := SITE + "/lycee/math/calcul/multiplier/moitie_quart.php"
+const V_DECIMAUX := SITE + "/lycee/math/ensemble/decimaux/nombres_decimaux.php"
+const V_ADDITION := SITE + "/lycee/math/calcul/calcul-mental.php"
+const V_SOUSTRACTION := SITE + "/lycee/math/calcul/addition/soustraction_posee_entier.php"
+const V_MULTIPLICATION := SITE + "/lycee/math/calcul/multiplier/multiplication_entier.php"
+const V_PRIORITES := SITE + "/lycee/math/ensemble/entier/priorite_operatoire.php"
+const V_TRIANGLE := SITE + "/lycee/math/figure/triangle/triangle_vocabulaire.php"
+const V_QUADRILATERE := SITE + "/lycee/math/figure/quadrilatere/quadrilatere_vocabulaire.php"
+const V_DROITE := SITE + "/lycee/math/droite/droite_sixieme.php"
+const V_PARALLELES := SITE + "/lycee/math/droite/droite_parallele_6e.php"
+const V_PERPENDICULAIRES := SITE + "/lycee/math/droite/droite_perpendiculaire_6e.php"
+const V_SEGMENT := SITE + "/lycee/math/droite/segment_milieu.php"
+const V_ANGLE := SITE + "/lycee/math/angle/angle_sixieme/angle_sixieme.php"
+const V_ANGLES_TYPES := SITE + "/lycee/math/angle/angle_sixieme/angle_aigu_obtu_droit.php"
+const V_PERIMETRE := SITE + "/lycee/math/grandeur/longueur/perimetre_rectangle_cercle.php"
+const V_AIRE := SITE + "/lycee/math/grandeur/aire/aire_rectangle_disque.php"
+const V_SYMETRIE := SITE + "/lycee/math/transformation/symetrie_axiale/symetrie_axiale_sixieme.php"
+const V_AXE := SITE + "/lycee/math/transformation/symetrie_axiale/axe_symetrie_figure.php"
+const V_CERCLE := SITE + "/lycee/math/figure/cercle/cercle_vocabulaire.php"
+const V_LONGUEUR := SITE + "/lycee/math/grandeur/longueur/longueur_sixieme.php"
+const V_MASSE := SITE + "/lycee/math/grandeur/masse/masse_sixieme.php"
+const V_DUREE := SITE + "/lycee/math/grandeur/duree/duree.php"
+const V_VOLUME := SITE + "/lycee/math/grandeur/volume/volume_sixieme_pave_droit.php"
+const V_TABLEAU := SITE + "/lycee/math/statistique/tableau/donnees_tableau_sixieme.php"
+const V_MOYENNE := SITE + "/lycee/math/statistique/moyenne/moyenne_cinquieme.php"
+const V_MEDIANE := SITE + "/lycee/math/statistique/mediane/mediane_quatrieme.php"
+const V_PROBA := SITE + "/lycee/math/probabilite/probabilite_cinquieme/probabilite_cinquieme.php"
+const V_BARRES := SITE + "/lycee/math/statistique/histogramme/diagramme_baton_sixieme.php"
+const V_GRAPHIQUE := SITE + "/lycee/math/statistique/graphique/lire_graphique_sixieme.php"
+
+const VIDEO_BY_SKILL := {
+	"Grands nombres": V_CHIFFRES,
+	"Multiples et diviseurs": V_MULTIPLES,
+	"Fractions": V_FRACTIONS,
+	"Opérations": V_PRIORITES,
+	"Polygones": V_TRIANGLE,
+	"Droites et segments": V_DROITE,
+	"Angles": V_ANGLE,
+	"Périmètres et aires": V_PERIMETRE,
+	"Symétrie": V_SYMETRIE,
+	"Cercle": V_CERCLE,
+	"Conversions": V_LONGUEUR,
+	"Durées": V_DUREE,
+	"Volumes": V_VOLUME,
+	"Masses et capacités": V_MASSE,
+	"Tableaux": V_TABLEAU,
+	"Moyenne et médiane": V_MOYENNE,
+	"Probabilités": V_PROBA,
+	"Graphiques": V_BARRES,
+}
+
+const LESSON_BY_SKILL := {
+	"Grands nombres": "Lis le nombre par groupes de trois chiffres : millions, milliers, unités. Chaque groupe se lit comme un nombre de trois chiffres, puis on ajoute le nom du groupe.",
+	"Multiples et diviseurs": "Un multiple est le résultat d'une multiplication. Un diviseur divise sans reste. Pour le PPCM, liste les multiples ; pour le PGCD, liste les diviseurs communs.",
+	"Fractions": "Une fraction représente une ou plusieurs parts d'un tout partagé en parts égales. Le dénominateur indique le nombre de parts, le numérateur le nombre de parts choisies.",
+	"Opérations": "Aligne les unités, les dizaines et les centaines pour additionner ou soustraire. Décompose les nombres pour multiplier, et cherche le nombre de fois que le diviseur est contenu pour diviser.",
+	"Polygones": "Un polygone est une figure fermée formée de segments. Le triangle a trois côtés, le quadrilatère quatre. Un carré a quatre côtés égaux et quatre angles droits.",
+	"Droites et segments": "Une droite est infinie, une demi-droite a une origine et un segment a deux extrémités. Des droites parallèles ne se croisent jamais ; des droites perpendiculaires forment un angle droit.",
+	"Angles": "Un angle se mesure en degrés. Un angle droit vaut quatre-vingt-dix degrés, un angle plat cent quatre-vingts degrés et un tour complet trois cent soixante degrés.",
+	"Périmètres et aires": "Le périmètre est la longueur du contour. Pour un carré, multiplie le côté par quatre. L'aire d'un rectangle est la longueur multipliée par la largeur, et s'exprime en centimètres carrés.",
+	"Symétrie": "Une figure est symétrique par rapport à un axe si, pliée le long de cet axe, ses deux parties se superposent exactement. Chaque point et son image sont à égale distance de l'axe.",
+	"Cercle": "Un cercle est défini par son centre et son rayon. Tous les points du cercle sont à la même distance du centre. Le diamètre passe par le centre et vaut deux rayons.",
+	"Conversions": "Pour convertir, multiplie ou divise par la valeur de l'unité. Kilo signifie mille, centi signifie centième et milli signifie millième.",
+	"Durées": "Une heure vaut soixante minutes et une minute vaut soixante secondes. Pour calculer une durée, avance heure par heure, puis minutes par minutes.",
+	"Volumes": "Le volume d'un pavé droit est la longueur multipliée par la largeur, puis par la hauteur. Pour un cube, on multiplie le côté trois fois, et on exprime le résultat en centimètres cubes.",
+	"Masses et capacités": "Un kilogramme vaut mille grammes. Un litre vaut cent centilitres et mille millilitres.",
+	"Tableaux": "Dans un tableau, chaque case appartient à une ligne et à une colonne. Pour retrouver une information, lis d'abord l'en-tête de la ligne, puis celui de la colonne.",
+	"Moyenne et médiane": "La moyenne est la somme des valeurs divisée par le nombre de valeurs. La médiane est la valeur centrale lorsque les valeurs sont classées par ordre croissant.",
+	"Probabilités": "La probabilité est le nombre d'issues favorables divisé par le nombre total d'issues équiprobables. La somme des probabilités de toutes les issues possibles vaut un.",
+	"Graphiques": "Un diagramme en barres sert à comparer des quantités. Pour lire une barre, repère la graduation atteinte, puis multiplie par la valeur d'une graduation.",
+}
+
+# Choix de la vidéo jaicompris.com la plus proche de la notion travaillée.
+func video_url(q: Dictionary) -> String:
+	var skill := str(q.get("skill", ""))
+	var text := str(q.get("question", "")).to_lower()
+	if skill == "Grands nombres":
+		return V_COMPARER if ("plus grand" in text or "compare" in text) else V_CHIFFRES
+	if skill == "Multiples et diviseurs":
+		if "divisible" in text and not "pgcd" in text and not "ppcm" in text:
+			return V_DIVISIBILITE
+		return V_MULTIPLES
+	if skill == "Fractions":
+		if "+" in text or "addition" in text:
+			return V_FRACTIONS_ADD
+		if "0," in text or "décimale" in text or "dixième" in text:
+			return V_DECIMAUX
+		if "moitié" in text or "1/2" in text or "quart" in text:
+			return V_MOITIE_QUART
+		return V_FRACTIONS
+	if skill == "Opérations":
+		if "÷" in text or "divis" in text:
+			return V_DIVISION_DEC if "décimal" in text else V_DIVISION
+		if "×" in text or "multipli" in text:
+			return V_MULTIPLICATION
+		if "-" in text or "soustrai" in text or "emprunte" in text:
+			return V_SOUSTRACTION
+		if "(" in text:
+			return V_PRIORITES
+		return V_ADDITION
+	if skill == "Polygones":
+		return V_QUADRILATERE if ("carré" in text or "quadrilatère" in text or "diagonale" in text) else V_TRIANGLE
+	if skill == "Droites et segments":
+		if "parallèle" in text:
+			return V_PARALLELES
+		if "perpendiculaire" in text:
+			return V_PERPENDICULAIRES
+		if "segment" in text:
+			return V_SEGMENT
+		return V_DROITE
+	if skill == "Angles":
+		return V_ANGLES_TYPES if ("droit" in text or "90" in text) else V_ANGLE
+	if skill == "Périmètres et aires":
+		return V_AIRE if "aire" in text else V_PERIMETRE
+	if skill == "Symétrie":
+		return V_AXE if "axe" in text else V_SYMETRIE
+	if skill == "Conversions":
+		if "kg" in text or " gramme" in text or "g ?" in text:
+			return V_MASSE
+		if "l" in text or "cl" in text or "ml" in text:
+			return V_VOLUME
+		return V_LONGUEUR
+	if skill == "Masses et capacités":
+		return V_MASSE
+	if skill == "Durées":
+		return V_DUREE
+	if skill == "Volumes":
+		return V_VOLUME
+	if skill == "Cercle":
+		return V_CERCLE
+	if skill == "Tableaux":
+		return V_TABLEAU
+	if skill == "Moyenne et médiane":
+		return V_MEDIANE if "médiane" in text else V_MOYENNE
+	if skill == "Probabilités":
+		return V_PROBA
+	if skill == "Graphiques":
+		return V_BARRES if ("barres" in text or "diagramme" in text) else V_GRAPHIQUE
+	return str(VIDEO_BY_SKILL.get(skill, ""))
+
+# Ouvre la vidéo dans un nouvel onglet (web) ou dans le navigateur (desktop).
+func open_video(q: Dictionary) -> bool:
+	var url := video_url(q)
+	if url.is_empty():
+		return false
+	if OS.has_feature("web"):
+		var opened: String = JavaScriptBridge.eval(
+			"(function(){var w=window.open(%s, '_blank', 'noopener'); return w ? 'ok' : 'blocked';})()" % JSON.stringify(url))
+		return opened == "ok"
+	OS.shell_open(url)
+	return true
+
+# Explication courte, lue à voix haute si aucune vidéo n'est disponible.
+func narrated_lesson(q: Dictionary) -> String:
+	var parts := PackedStringArray()
+	var method := str(LESSON_BY_SKILL.get(str(q.get("skill", "")), ""))
+	if not method.is_empty():
+		parts.append(method)
+	var explanation := str(q.get("explanation", ""))
+	if not explanation.is_empty():
+		parts.append(explanation)
+	var hint := str(q.get("hint", ""))
+	if not hint.is_empty():
+		parts.append(hint)
+	return " ".join(parts)
+
 # appelé au chargement
 func _ready():
 	_init_db()

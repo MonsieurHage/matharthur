@@ -18,12 +18,17 @@ func _ready():
 			break
 	if current_voice == "" and voices.size() > 0:
 		current_voice = voices[0].get("id", "")
+	# La synthèse vocale du navigateur (Web Speech) fonctionne sans risque mémoire.
+	if OS.has_feature("web") and not voices.is_empty():
+		if current_voice.is_empty():
+			current_voice = voices[0].get("id", "")
 	enabled = not current_voice.is_empty()
 
-func speak(text: String, rate: float = 1.0):
+func speak(text: String, rate: float = 1.0) -> bool:
 	if not enabled or not GameState.state["settings"]["speech"]:
-		return
+		return false
 	DisplayServer.tts_speak(text, current_voice, 65, 1.0, rate, 0, true)
+	return true
 
 func stop():
 	if enabled:

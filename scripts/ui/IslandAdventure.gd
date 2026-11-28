@@ -621,7 +621,37 @@ func _explain() -> void:
 			info.text += "\nLecture indisponible : vérifie la voix française sur ton appareil."
 
 func _video() -> void:
-	QuestionsDB.open_video(question)
+	if QuestionsDB.open_video(question):
+		_toast("Vidéo jaicompris.com ouverte dans un nouvel onglet.")
+		return
+	var lesson := QuestionsDB.narrated_lesson(question)
+	if lesson.is_empty():
+		_toast("Aucune vidéo disponible pour cette notion.")
+		return
+	Speech.speak(lesson)
+	_toast("Explication en voix off : " + lesson)
+
+func _toast(message: String) -> void:
+	var copy := message
+	if copy.length() > 150:
+		copy = copy.substr(0, 147) + "…"
+	var card := UI.card(UI.PAPER, 10)
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.anchor_left = 0.0
+	card.anchor_right = 1.0
+	card.anchor_top = 0.0
+	card.anchor_bottom = 0.0
+	card.offset_left = 12
+	card.offset_right = -12
+	card.offset_top = 8
+	card.offset_bottom = 68
+	var note := UI.label(copy, 15, UI.INK)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	card.add_child(note)
+	screen.add_child(card)
+	await get_tree().create_timer(4.0).timeout
+	if is_instance_valid(card):
+		card.queue_free()
 
 func _answer(slot: int) -> void:
 	if mode != "quiz":
