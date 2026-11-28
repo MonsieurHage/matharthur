@@ -34,7 +34,8 @@ func _default_state() -> Dictionary:
 		"leaderboard": [],
 		"unlockedMultiplayer": false,
 		"dailyChallenge": null,
-		"lastVisit": null
+		"lastVisit": null,
+		"exerciseLog": []
 	}
 
 func _merge_defaults():
@@ -80,7 +81,7 @@ func spend_wallet(amount: int) -> bool:
 		return true
 	return false
 
-func record_answer(domain: String, correct: bool):
+func record_answer(domain: String, correct: bool, question: Dictionary = {}, answer: String = "") -> int:
 	var s = state["stats"]
 	s["totalQuestions"] += 1
 	if correct:
@@ -102,5 +103,35 @@ func record_answer(domain: String, correct: bool):
 	if correct: p["correct"] += 1
 	var acc = float(p["correct"]) / float(p["attempts"])
 	p["mastery"] = 0.7 * p["mastery"] + 0.3 * acc
+	if not question.is_empty():
+		_append_exercise({
+			"domain": domain,
+			"id": str(question.get("id", "")),
+			"question": str(question.get("question", "")),
+			"answer": answer,
+			"result": "Correct" if correct else "Incorrect",
+			"date": Time.get_datetime_string_from_system()
+		})
 	save()
 	return s["streak"]
+
+func log_exercise(question: Dictionary, result: String, answer: String) -> void:
+	if question.is_empty():
+		return
+	_append_exercise({
+		"domain": str(question.get("domain", "")),
+		"id": str(question.get("id", "")),
+		"question": str(question.get("question", "")),
+		"answer": answer,
+		"result": result,
+		"date": Time.get_datetime_string_from_system()
+	})
+	save()
+
+func _append_exercise(entry: Dictionary) -> void:
+	if not state.has("exerciseLog") or not state["exerciseLog"] is Array:
+		state["exerciseLog"] = []
+	var history: Array = state["exerciseLog"]
+	history.append(entry)
+	if history.size() > 200:
+		state["exerciseLog"] = history.slice(history.size() - 200)

@@ -33,7 +33,6 @@ Speech="*res://scripts/autoload/Speech.gd"
 Encouragement="*res://scripts/autoload/Encouragement.gd"
 QuestionsDB="*res://scripts/QuestionsDB.gd"
 ShopDB="*res://scripts/ShopDB.gd"
-Preferences="*res://scripts/autoload/Preferences.gd"
 
 [display]
 
