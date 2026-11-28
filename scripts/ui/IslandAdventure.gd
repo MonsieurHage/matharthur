@@ -64,7 +64,7 @@ var wood_plot: Node3D
 
 func _ready() -> void:
 	_set_world(0)
-	if DisplayServer.get_name() != "headless" and not DisplayServer.is_touchscreen_available():
+	if OS.get_name() != "Web" and DisplayServer.get_name() != "headless" and not DisplayServer.is_touchscreen_available():
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	camera = Camera3D.new()
 	camera.fov = 54
