@@ -29,27 +29,36 @@ static func button(copy: String, primary: bool = false, radius: int = 14) -> But
 	result.text = copy
 	result.custom_minimum_size.y = 48
 	result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var normal := Color("#e0f1f4")
+	var hover := Color("#c4e6ea")
+	var pressed := Color("#81a1a9")
+	var hover_pressed := Color("#7c98a0")
+	var text_color := INK
+	if primary:
+		normal = Color("#254bba")
+		hover = Color("#3b5fa8")
+		pressed = Color("#1c3486")
+		hover_pressed = Color("#1c3486")
+		text_color = WHITE
 	for state in ["normal", "hover", "pressed", "disabled", "hover_pressed"]:
-		var base := surface(Color("#e0f1f4"), radius, 10)
-		if state == "hover":
-			base = surface(Color("#c4e6ea"), radius, 10)
-		elif state == "pressed":
-			base = surface(Color("#81a1a9"), radius, 10)
-		elif state == "hover_pressed":
-			base = surface(Color("#7c98a0"), radius, 10)
-		elif state == "disabled":
-			base = surface(Color("#e3e6e8"), radius, 10)
-		result.add_theme_stylebox_override(state, base)
+		var bg := normal
+		match state:
+			"hover": bg = hover
+			"pressed": bg = pressed
+			"hover_pressed": bg = hover_pressed
+			"disabled": bg = Color("#e3e6e8")
+		result.add_theme_stylebox_override(state, surface(bg, radius, 10))
 	for key in ["font_color", "font_hover_color", "font_pressed_color",
 			"font_hover_pressed_color", "font_focus_color"]:
-		result.add_theme_color_override(key, MINT if not primary else Color.WHITE)
+		result.add_theme_color_override(key, text_color)
 	result.add_theme_color_override("font_disabled_color", MUTED)
 	return result
 
 static func style_button(result: Button, primary: bool = false) -> Button:
+	var text_color := WHITE if primary else INK
 	for key in ["font_color", "font_hover_color", "font_pressed_color",
 			"font_hover_pressed_color", "font_focus_color"]:
-		result.add_theme_color_override(key, MINT if not primary else Color.WHITE)
+		result.add_theme_color_override(key, text_color)
 	result.add_theme_color_override("font_disabled_color", MUTED)
 	return result
 
@@ -63,10 +72,10 @@ static func theme_setup() -> Theme:
 	theme.set_default_stylebox("Button", "normal", green)
 	theme.set_default_stylebox("Button", "hover", surface(Color("#d1ead7")))
 	theme.set_default_stylebox("Button", "pressed", surface(Color("#a4c2a4")))
-	theme.set_default_color("Button", "font_color", Color.WHITE)
-	theme.set_default_color("Button", "font_hover_color", Color.WHITE)
-	theme.set_default_color("Button", "font_pressed_color", Color.WHITE)
-	theme.set_default_color("Button", "font_focus_color", Color.WHITE)
+	theme.set_default_color("Button", "font_color", INK)
+	theme.set_default_color("Button", "font_hover_color", INK)
+	theme.set_default_color("Button", "font_pressed_color", INK)
+	theme.set_default_color("Button", "font_focus_color", INK)
 	theme.set_default_color("Button", "font_disabled_color", MUTED)
 	theme.set_default_color("PanelContainer", "background", Color.WHITE)
 	theme.set_default_color("ProgressBar", "font_color", INK)
@@ -108,16 +117,16 @@ static func xp_track(value: float, target: float) -> ProgressBar:
 
 static func primary_button(copy: String) -> Button:
 	var result := button(copy, true)
-	result.add_theme_stylebox_override("normal", surface(Color("#e2dffb"), 16, 12))
-	result.add_theme_stylebox_override("hover", surface(Color("#3b5fa8"), 16, 12))
-	result.add_theme_stylebox_override("pressed", surface(Color("#b8c4f0"), 16, 12))
+	result.add_theme_stylebox_override("normal", surface(Color("#3b2e8f"), 16, 12))
+	result.add_theme_stylebox_override("hover", surface(Color("#2f2478"), 16, 12))
+	result.add_theme_stylebox_override("pressed", surface(Color("#241c5e"), 16, 12))
 	result.add_theme_stylebox_override("disabled", surface(Color("#e7e7e7"), 16, 12))
 	return result
 
 static func card_str(color: String, padding: int = 14, radius: int = 18) -> PanelContainer:
 	return card(Color(color), padding, radius)
 
-static var MUTED: Color
+static var MUTED := Color("#4a5b73")
 static var GOLD := Color("#fff3b0")
 static var CYAN := Color("#b3e2ff")
 static var WHITE := Color("#ffffff")
