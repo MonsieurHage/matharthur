@@ -622,7 +622,7 @@ func _explain() -> void:
 
 func _video() -> void:
 	if QuestionsDB.open_video(question):
-		_toast("Vidéo jaicompris.com ouverte dans un nouvel onglet.")
+		_toast("Vidéo jaicompris.com lancée dans un nouvel onglet.")
 		return
 	var lesson := QuestionsDB.narrated_lesson(question)
 	if lesson.is_empty():

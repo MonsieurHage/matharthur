@@ -127,44 +127,47 @@ func gen_operation(difficulty: int) -> Dictionary:
 # ---------------------------------------------------------------------------
 # Vidéos ciblées (jaicompris.com) et explicatif vocal de secours
 # ---------------------------------------------------------------------------
-const SITE := "https://jaicompris.com"
-const V_CHIFFRES := SITE + "/lycee/math/ensemble/entier/nombres_entiers_chiffre_nombre.php"
-const V_COMPARER := SITE + "/lycee/math/ensemble/entier/nombres_entiers.php"
-const V_MULTIPLES := SITE + "/lycee/math/arithmetique/multiple_diviseur.php"
-const V_DIVISIBILITE := SITE + "/lycee/math/arithmetique/critere_divisibilite.php"
-const V_DIVISION := SITE + "/lycee/math/arithmetique/division_euclidienne_sixieme.php"
-const V_DIVISION_DEC := SITE + "/lycee/math/arithmetique/division_decimale.php"
-const V_FRACTIONS := SITE + "/lycee/math/calcul/fraction/fraction_intro_sixieme.php"
-const V_FRACTIONS_ADD := SITE + "/lycee/math/calcul/fraction/fraction_addition_sixieme.php"
-const V_MOITIE_QUART := SITE + "/lycee/math/calcul/multiplier/moitie_quart.php"
-const V_DECIMAUX := SITE + "/lycee/math/ensemble/decimaux/nombres_decimaux.php"
-const V_ADDITION := SITE + "/lycee/math/calcul/calcul-mental.php"
-const V_SOUSTRACTION := SITE + "/lycee/math/calcul/addition/soustraction_posee_entier.php"
-const V_MULTIPLICATION := SITE + "/lycee/math/calcul/multiplier/multiplication_entier.php"
-const V_PRIORITES := SITE + "/lycee/math/ensemble/entier/priorite_operatoire.php"
-const V_TRIANGLE := SITE + "/lycee/math/figure/triangle/triangle_vocabulaire.php"
-const V_QUADRILATERE := SITE + "/lycee/math/figure/quadrilatere/quadrilatere_vocabulaire.php"
-const V_DROITE := SITE + "/lycee/math/droite/droite_sixieme.php"
-const V_PARALLELES := SITE + "/lycee/math/droite/droite_parallele_6e.php"
-const V_PERPENDICULAIRES := SITE + "/lycee/math/droite/droite_perpendiculaire_6e.php"
-const V_SEGMENT := SITE + "/lycee/math/droite/segment_milieu.php"
-const V_ANGLE := SITE + "/lycee/math/angle/angle_sixieme/angle_sixieme.php"
-const V_ANGLES_TYPES := SITE + "/lycee/math/angle/angle_sixieme/angle_aigu_obtu_droit.php"
-const V_PERIMETRE := SITE + "/lycee/math/grandeur/longueur/perimetre_rectangle_cercle.php"
-const V_AIRE := SITE + "/lycee/math/grandeur/aire/aire_rectangle_disque.php"
-const V_SYMETRIE := SITE + "/lycee/math/transformation/symetrie_axiale/symetrie_axiale_sixieme.php"
-const V_AXE := SITE + "/lycee/math/transformation/symetrie_axiale/axe_symetrie_figure.php"
-const V_CERCLE := SITE + "/lycee/math/figure/cercle/cercle_vocabulaire.php"
-const V_LONGUEUR := SITE + "/lycee/math/grandeur/longueur/longueur_sixieme.php"
-const V_MASSE := SITE + "/lycee/math/grandeur/masse/masse_sixieme.php"
-const V_DUREE := SITE + "/lycee/math/grandeur/duree/duree.php"
-const V_VOLUME := SITE + "/lycee/math/grandeur/volume/volume_sixieme_pave_droit.php"
-const V_TABLEAU := SITE + "/lycee/math/statistique/tableau/donnees_tableau_sixieme.php"
-const V_MOYENNE := SITE + "/lycee/math/statistique/moyenne/moyenne_cinquieme.php"
-const V_MEDIANE := SITE + "/lycee/math/statistique/mediane/mediane_quatrieme.php"
-const V_PROBA := SITE + "/lycee/math/probabilite/probabilite_cinquieme/probabilite_cinquieme.php"
-const V_BARRES := SITE + "/lycee/math/statistique/histogramme/diagramme_baton_sixieme.php"
-const V_GRAPHIQUE := SITE + "/lycee/math/statistique/graphique/lire_graphique_sixieme.php"
+# Vidéos de la chaîne jaicompris Maths, ouvertes directement (pas la page de cours).
+const YT := "https://www.youtube.com/watch?v="
+const V_CHIFFRES := YT + "t_bTIjKvz10"
+const V_COMPARER := YT + "sdIbt-75KFg"
+const V_MULTIPLES := YT + "i3jnjQBnRPw"
+const V_DIVISEURS := YT + "uHcm4yaTYaI"
+const V_DIVISIBILITE := YT + "VJymed8QSk8"
+const V_DIVISION := YT + "LE_O3xfGclM"
+const V_DIVISION_DEC := YT + "zYV7PQcLVQ0"
+const V_FRACTIONS := YT + "wacBvevkJEc"
+const V_FRACTIONS_ADD := YT + "kxX5diiiq8s"
+const V_MOITIE_QUART := YT + "txC6OXV3tiE"
+const V_DECIMAUX := YT + "2oBVEt83iEo"
+const V_ADDITION := YT + "WVZLM_GqjbQ"
+const V_SOUSTRACTION := YT + "CmPqjkjsmAc"
+const V_MULTIPLICATION := YT + "RKtqvJcgoi4"
+const V_PRIORITES := YT + "vt2Y3ftao5g"
+const V_TRIANGLE := YT + "OfL3EVzq4uU"
+const V_QUADRILATERE := YT + "r682ePlouuU"
+const V_DROITE := YT + "Kgs0l1NnNuU"
+const V_PARALLELES := YT + "enSRsx1TJ5o"
+const V_PERPENDICULAIRES := YT + "kS7CEW9aOBM"
+const V_SEGMENT := YT + "AaOIpwv32bM"
+const V_ANGLE := YT + "1QuN2gVs4rI"
+const V_ANGLES_TYPES := YT + "ngfB_SOxx2Y"
+const V_PERIMETRE := YT + "nCRYbE2bQeU"
+const V_AIRE := YT + "PxN2l0ToO8c"
+const V_SYMETRIE := YT + "4PapXYDrJyQ"
+const V_AXE := YT + "sKVqr8dgHzM"
+const V_CERCLE := YT + "ZXRAi9d5qmg"
+const V_LONGUEUR := YT + "NtU4apuTygk"
+const V_MASSE := YT + "9fHdrWjE9j0"
+const V_DUREE := YT + "9IIcLRhI-Qs"
+const V_VOLUME := YT + "ThYQkfvoesQ"
+const V_CAPACITE := YT + "-ULlseGWcwc"
+const V_TABLEAU := YT + "kJ0cPLmyd3E"
+const V_MOYENNE := YT + "68a-wxGaq-w"
+const V_MEDIANE := YT + "8eqc7rqGQks"
+const V_PROBA := YT + "ytLG6HijPhk"
+const V_BARRES := YT + "SRPGGsyfFA0"
+const V_GRAPHIQUE := YT + "dOdhjwMOLqo"
 
 const VIDEO_BY_SKILL := {
 	"Grands nombres": V_CHIFFRES,
@@ -215,7 +218,9 @@ func video_url(q: Dictionary) -> String:
 	if skill == "Grands nombres":
 		return V_COMPARER if ("plus grand" in text or "compare" in text) else V_CHIFFRES
 	if skill == "Multiples et diviseurs":
-		if "divisible" in text and not "pgcd" in text and not "ppcm" in text:
+		if "diviseur" in text or "pgcd" in text:
+			return V_DIVISEURS
+		if "divisible" in text:
 			return V_DIVISIBILITE
 		return V_MULTIPLES
 	if skill == "Fractions":
@@ -255,11 +260,11 @@ func video_url(q: Dictionary) -> String:
 	if skill == "Conversions":
 		if "kg" in text or " gramme" in text or "g ?" in text:
 			return V_MASSE
-		if "l" in text or "cl" in text or "ml" in text:
-			return V_VOLUME
+		if "cl" in text or "ml" in text or "1 l" in text:
+			return V_CAPACITE
 		return V_LONGUEUR
 	if skill == "Masses et capacités":
-		return V_MASSE
+		return V_CAPACITE if ("cl" in text or "ml" in text or "1 l" in text) else V_MASSE
 	if skill == "Durées":
 		return V_DUREE
 	if skill == "Volumes":
